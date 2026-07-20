@@ -20,10 +20,6 @@ enum SPRITES_ID {
     SPR_BATTER_UP,
     SPR_BATTER_LEFT,
     SPR_BATTER_DOWN,
-    SPR_BATTER_WALKING_RIGHT,
-    SPR_BATTER_WALKING_UP,
-    SPR_BATTER_WALKING_LEFT,
-    SPR_BATTER_WALKING_DOWN,
     SPRITES_TOTAL
 };
 
@@ -35,15 +31,11 @@ void registerSprites() {
     sprites = malloc(sizeof(Texture) * SPRITES_TOTAL);
 
     registerSprite(SPR_TEST, "wabbit_alpha.png");
+
     registerSprite(SPR_BATTER_RIGHT, "spr_batter_right.png");
     registerSprite(SPR_BATTER_UP, "spr_batter_up.png");
     registerSprite(SPR_BATTER_LEFT, "spr_batter_left.png");
     registerSprite(SPR_BATTER_DOWN, "spr_batter_down.png");
-
-    registerSprite(SPR_BATTER_WALKING_RIGHT, "spr_batter_walking_right.png");
-    registerSprite(SPR_BATTER_WALKING_UP, "spr_batter_walking_up.png");
-    registerSprite(SPR_BATTER_WALKING_LEFT, "spr_batter_walking_left.png");
-    registerSprite(SPR_BATTER_WALKING_DOWN, "spr_batter_walking_down.png");
 }
 
 int main() {
@@ -87,7 +79,7 @@ int main() {
     float speed = 1.0f;
 
     float image_index = 0.0f;
-    float image_speed = 0.2f;
+    float image_speed = 0.1f;
     float image_number = 4;
     bool is_moving = false;
     enum DIRECTION direction = DOWN;
@@ -117,13 +109,12 @@ int main() {
 
             image_index += image_speed;
             if (image_index > image_number) image_index -= image_number;
-        }
-        else image_index = 0;
+        } else image_index = 0;
 
 
         // Make the camera move to demonstrate the effect
-        cameraX = position.x - (float)camera_width/2;
-        cameraY = position.y - (float)camera_height/2;
+        cameraX = position.x - (float) camera_width / 2;
+        cameraY = position.y - (float) camera_height / 2;
 
         // Set the camera's target to the values computed above
         rendering_camera.target = (Vector2){cameraX, cameraY};
@@ -149,20 +140,25 @@ int main() {
         BeginMode2D(camera);
 
         enum SPRITES_ID player = 0;
-        if (!is_moving) {
-            switch (direction) {
-                case UP: player = SPR_BATTER_DOWN; break;
-                case LEFT: player = SPR_BATTER_LEFT; break;
-                case RIGHT: player = SPR_BATTER_RIGHT; break;
-                case DOWN: player = SPR_BATTER_DOWN; break;
-            }
-        } else {
-
+        switch (direction) {
+            case UP: player = SPR_BATTER_UP;
+                break;
+            case LEFT: player = SPR_BATTER_LEFT;
+                break;
+            case RIGHT: player = SPR_BATTER_RIGHT;
+                break;
+            case DOWN: player = SPR_BATTER_DOWN;
+                break;
         }
+
+        Rectangle frameRectangle = (Rectangle){16.0f * truncf(image_index), 0,16, 24};
+
+        DrawTextureRec(sprites[player], frameRectangle, (Vector2){position.x, position.y}, WHITE);
+
 
         //DrawRectangle((int) position.x - 16, (int) position.y - 16, 32, 32, RED);
 
-        for (int sprite = 0; sprite <  SPRITES_TOTAL; sprite++) {
+        for (int sprite = 0; sprite < SPRITES_TOTAL; sprite++) {
             if (IsTextureValid(sprites[sprite])) {
                 const Texture* texture = &sprites[sprite];
                 DrawTexture(*texture, 20 + 16 * sprite, 16, WHITE);
