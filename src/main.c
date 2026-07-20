@@ -1,7 +1,43 @@
 #include <math.h>
+#include <stddef.h>
+#include <stdlib.h>
 
 #include "raylib.h"
 #include "resource_dir.h"
+
+Texture* sprites = NULL;
+
+enum SPRITES_ID {
+    SPR_TEST,
+    SPR_BATTER_RIGHT,
+    SPR_BATTER_UP,
+    SPR_BATTER_LEFT,
+    SPR_BATTER_DOWN,
+    SPR_BATTER_WALKING_RIGHT,
+    SPR_BATTER_WALKING_UP,
+    SPR_BATTER_WALKING_LEFT,
+    SPR_BATTER_WALKING_DOWN,
+    SPRITES_TOTAL
+};
+
+void registerSprite(enum SPRITES_ID sprite, const char* resource_path) {
+    sprites[sprite] = LoadTexture(resource_path);
+}
+
+void registerSprites() {
+    sprites = malloc(sizeof(Texture) * SPRITES_TOTAL);
+
+    registerSprite(SPR_TEST, "wabbit_alpha.png");
+    registerSprite(SPR_BATTER_RIGHT, "spr_batter_right.png");
+    registerSprite(SPR_BATTER_UP, "spr_batter_up.png");
+    registerSprite(SPR_BATTER_LEFT, "spr_batter_left.png");
+    registerSprite(SPR_BATTER_DOWN, "spr_batter_down.png");
+
+    registerSprite(SPR_BATTER_WALKING_RIGHT, "spr_batter_walking_right.png");
+    registerSprite(SPR_BATTER_WALKING_UP, "spr_batter_walking_up.png");
+    registerSprite(SPR_BATTER_WALKING_LEFT, "spr_batter_walking_left.png");
+    registerSprite(SPR_BATTER_WALKING_DOWN, "spr_batter_walking_down.png");
+}
 
 int main() {
     // Setup
@@ -11,12 +47,13 @@ int main() {
     const int window_width = 800;
     const int window_height = 450;
 
-    const int camera_width = 160;
-    const int camera_height = 90;
+    const int camera_width = 400;
+    const int camera_height = 225;
 
     const float camera_window_ratio = (float) window_width / (float) camera_width;
 
     InitWindow(window_width, window_height, "Paco's Game Engine");
+    registerSprites();
 
     Camera2D camera = {0};
     camera.zoom = 1.0f;
@@ -84,8 +121,12 @@ int main() {
 
         DrawRectangle((int) position.x - 16, (int) position.y - 16, 32, 32, RED);
 
-        DrawRectangle(40, 40, 100, 30, BLUE);
-        DrawRectangle(10, 20, 10, 100, YELLOW);
+        for (int sprite = 0; sprite <  SPRITES_TOTAL; sprite++) {
+            if (IsTextureValid(sprites[sprite])) {
+                const Texture* texture = &sprites[sprite];
+                DrawTexture(*texture, 20 + 16 * sprite, 16, WHITE);
+            }
+        }
 
         EndMode2D();
         EndTextureMode();
