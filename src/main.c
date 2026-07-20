@@ -7,12 +7,13 @@ int main() {
     int window_width = 800;
     int window_height = 450;
 
-    const int camera_width = 40;
-    const int camera_height = 30;
+    const int camera_width = 100;
+    const int camera_height = 100;
+
+    const float camera_ration = (float)cam
 
     Camera2D camera = {0};
     camera.zoom = 1.0f;
-    //camera.offset = (Vector2){window_width / 2, window_height / 2};
 
     RenderTexture2D application_surface = LoadRenderTexture(camera_width, camera_height);
 
@@ -25,6 +26,7 @@ int main() {
     float speed = 1.0f;
 
     while (!WindowShouldClose()) {
+        /// STEP
         const bool up = IsKeyDown(KEY_UP);
         const bool down = IsKeyDown(KEY_DOWN);
         const bool left = IsKeyDown(KEY_LEFT);
@@ -38,15 +40,21 @@ int main() {
 
         camera.target = position;
 
-        BeginDrawing();
+        /// DRAW
+        BeginTextureMode(application_surface);
         BeginMode2D(camera);
+
         ClearBackground(BLACK);
-
         DrawRectangle((int) position.x - 16, (int) position.y - 16, 32, 32, RED);
-
         DrawText("Hello Raylib", 200, 200, 20,WHITE);
 
         EndMode2D();
+        EndTextureMode();
+
+        /// DRAW GUI
+        BeginDrawing();
+        ClearBackground(RAYWHITE);
+        DrawTexture(application_surface.texture, 0, 0, WHITE);
         EndDrawing();
     }
 
