@@ -7,6 +7,13 @@
 
 Texture* sprites = NULL;
 
+enum DIRECTION {
+    LEFT = 0,
+    UP = 90,
+    RIGHT = 180,
+    DOWN = 270,
+};
+
 enum SPRITES_ID {
     SPR_TEST,
     SPR_BATTER_RIGHT,
@@ -79,6 +86,12 @@ int main() {
     Vector2 position = {0};
     float speed = 1.0f;
 
+    float image_index = 0.0f;
+    float image_speed = 0.2f;
+    float image_number = 4;
+    bool is_moving = false;
+    enum DIRECTION direction = DOWN;
+
     while (!WindowShouldClose()) {
         /// STEP
         const bool up = IsKeyDown(KEY_UP);
@@ -91,6 +104,22 @@ int main() {
 
         position.x += (float) horizontal_direction * speed;
         position.y += (float) vertical_direction * speed;
+
+        is_moving = horizontal_direction != 0 || vertical_direction != 0;
+        if (is_moving) {
+            if (vertical_direction != 0) {
+                if (vertical_direction == 1) direction = DOWN;
+                else direction = UP;
+            } else {
+                if (horizontal_direction == 1) direction = RIGHT;
+                else direction = LEFT;
+            }
+
+            image_index += image_speed;
+            if (image_index > image_number) image_index -= image_number;
+        }
+        else image_index = 0;
+
 
         // Make the camera move to demonstrate the effect
         cameraX = position.x - (float)camera_width/2;
@@ -119,7 +148,19 @@ int main() {
 
         BeginMode2D(camera);
 
-        DrawRectangle((int) position.x - 16, (int) position.y - 16, 32, 32, RED);
+        enum SPRITES_ID player = 0;
+        if (!is_moving) {
+            switch (direction) {
+                case UP: player = SPR_BATTER_DOWN; break;
+                case LEFT: player = SPR_BATTER_LEFT; break;
+                case RIGHT: player = SPR_BATTER_RIGHT; break;
+                case DOWN: player = SPR_BATTER_DOWN; break;
+            }
+        } else {
+
+        }
+
+        //DrawRectangle((int) position.x - 16, (int) position.y - 16, 32, 32, RED);
 
         for (int sprite = 0; sprite <  SPRITES_TOTAL; sprite++) {
             if (IsTextureValid(sprites[sprite])) {
