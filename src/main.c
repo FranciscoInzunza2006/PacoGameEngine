@@ -39,6 +39,8 @@ void registerSprites() {
 }
 
 int main() {
+    int* foo = nullptr;
+
     // Setup
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
     SearchAndSetResourceDir("resources");

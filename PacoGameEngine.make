@@ -45,7 +45,7 @@ TARGETDIR = bin/Debug
 TARGET = $(TARGETDIR)/PacoGameEngine
 OBJDIR = obj/x64/Debug/PacoGameEngine
 DEFINES += -DDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_GLFW_X11
-ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -Wshadow -g -std=c2x
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -Wshadow -g -std=c23
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -Wshadow -g -std=c++20
 LIBS += bin/Debug/libraylib.a -lpthread -lm -ldl -lrt -lX11
 LDDEPS += bin/Debug/libraylib.a
@@ -56,7 +56,7 @@ TARGETDIR = bin/Debug
 TARGET = $(TARGETDIR)/PacoGameEngine
 OBJDIR = obj/x86/Debug/PacoGameEngine
 DEFINES += -DDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_GLFW_X11
-ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m32 -Wshadow -g -std=c2x
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m32 -Wshadow -g -std=c23
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m32 -Wshadow -g -std=c++20
 LIBS += bin/Debug/libraylib.a -lpthread -lm -ldl -lrt -lX11
 LDDEPS += bin/Debug/libraylib.a
@@ -67,7 +67,7 @@ TARGETDIR = bin/Debug
 TARGET = $(TARGETDIR)/PacoGameEngine
 OBJDIR = obj/ARM64/Debug/PacoGameEngine
 DEFINES += -DDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_GLFW_X11
-ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Wshadow -g -std=c2x
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Wshadow -g -std=c23
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Wshadow -g -std=c++20
 LIBS += bin/Debug/libraylib.a -lpthread -lm -ldl -lrt -lX11
 LDDEPS += bin/Debug/libraylib.a
@@ -78,7 +78,7 @@ TARGETDIR = bin/Release
 TARGET = $(TARGETDIR)/PacoGameEngine
 OBJDIR = obj/x64/Release/PacoGameEngine
 DEFINES += -DNDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_GLFW_X11
-ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -Wshadow -O2 -std=c2x
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -Wshadow -O2 -std=c23
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -Wshadow -O2 -std=c++20
 LIBS += bin/Release/libraylib.a -lpthread -lm -ldl -lrt -lX11
 LDDEPS += bin/Release/libraylib.a
@@ -89,7 +89,7 @@ TARGETDIR = bin/Release
 TARGET = $(TARGETDIR)/PacoGameEngine
 OBJDIR = obj/x86/Release/PacoGameEngine
 DEFINES += -DNDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_GLFW_X11
-ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m32 -Wshadow -O2 -std=c2x
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m32 -Wshadow -O2 -std=c23
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m32 -Wshadow -O2 -std=c++20
 LIBS += bin/Release/libraylib.a -lpthread -lm -ldl -lrt -lX11
 LDDEPS += bin/Release/libraylib.a
@@ -100,7 +100,7 @@ TARGETDIR = bin/Release
 TARGET = $(TARGETDIR)/PacoGameEngine
 OBJDIR = obj/ARM64/Release/PacoGameEngine
 DEFINES += -DNDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_GLFW_X11
-ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Wshadow -O2 -std=c2x
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Wshadow -O2 -std=c23
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Wshadow -O2 -std=c++20
 LIBS += bin/Release/libraylib.a -lpthread -lm -ldl -lrt -lX11
 LDDEPS += bin/Release/libraylib.a
