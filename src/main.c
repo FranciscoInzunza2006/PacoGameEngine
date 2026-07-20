@@ -4,23 +4,44 @@
 int main() {
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
 
-    int window_width = 800;
-    int window_height = 450;
+    const int screenWidth = 800;
+    const int screenHeight = 450;
 
-    const int camera_width = 100;
-    const int camera_height = 100;
+    const int virtualScreenWidth = 160;
+    const int virtualScreenHeight = 90;
 
-    const float camera_ration = (float)cam
+    const float virtualRatio = (float)screenWidth/(float)virtualScreenWidth;
 
-    Camera2D camera = {0};
-    camera.zoom = 1.0f;
+    InitWindow(screenWidth, screenHeight, "raylib [core] example - smooth pixelperfect");
 
-    RenderTexture2D application_surface = LoadRenderTexture(camera_width, camera_height);
+    Camera2D worldSpaceCamera = { 0 };  // Game world camera
+    worldSpaceCamera.zoom = 1.0f;
 
-    InitWindow(window_width, window_height, "Hello Raylib");
+    Camera2D screenSpaceCamera = { 0 }; // Smoothing camera
+    screenSpaceCamera.zoom = 1.0f;
 
-    SearchAndSetResourceDir("resources");
-    Texture wabbit = {0};
+    Rectangle rec01 = { 70.0f, 35.0f, 20.0f, 20.0f };
+    Rectangle rec02 = { 90.0f, 55.0f, 30.0f, 10.0f };
+    Rectangle rec03 = { 80.0f, 65.0f, 15.0f, 25.0f };
+
+    // Load render texture to draw all our objects
+    RenderTexture2D target = LoadRenderTexture(virtualScreenWidth, virtualScreenHeight);
+
+    // The target's height is flipped (in the source Rectangle), due to OpenGL reasons
+    Rectangle sourceRec = { 0.0f, 0.0f, (float)target.texture.width, -(float)target.texture.height };
+    Rectangle destRec = { (screenWidth - screenWidth/1.25f)/2.0f, (screenHeight - screenHeight/1.25f)/2.0f, screenWidth/1.25f, screenHeight/1.25f };
+
+    Vector2 origin = { 0.0f, 0.0f };
+
+    float rotation = 0.0f;
+
+    float cameraX = 0.0f;
+    float cameraY = 0.0f;
+
+    bool smoothOn = true;
+    bool overscan = false;
+
+    SetTargetFPS(60);
 
     Vector2 position = {0};
     float speed = 1.0f;
@@ -38,26 +59,96 @@ int main() {
         position.x += horizontal_direction * speed;
         position.y += vertical_direction * speed;
 
-        camera.target = position;
+        // Make the camera move to demonstrate the effect
+        cameraX = position.x; //(sinf((float)GetTime())*50.0f) - 10.0f;
+        cameraY = position.y; //cosf((float)GetTime())*30.0f;
 
-        /// DRAW
-        BeginTextureMode(application_surface);
-        BeginMode2D(camera);
+        // Set the camera's target to the values computed above
+        screenSpaceCamera.target = (Vector2){ cameraX, cameraY };
 
-        ClearBackground(BLACK);
-        DrawRectangle((int) position.x - 16, (int) position.y - 16, 32, 32, RED);
-        DrawText("Hello Raylib", 200, 200, 20,WHITE);
+        // Round worldSpace coordinates, keep decimals into screenSpace coordinates
+        worldSpaceCamera.target.x = truncf(screenSpaceCamera.target.x);
+        screenSpaceCamera.target.x -= worldSpaceCamera.target.x;
+        screenSpaceCamera.target.x *= virtualRatio;
+
+        worldSpaceCamera.target.y = truncf(screenSpaceCamera.target.y);
+        screenSpaceCamera.target.y -= worldSpaceCamera.target.y;
+        screenSpaceCamera.target.y *= virtualRatio;
+
+        if (IsKeyPressed(KEY_S)) smoothOn = !smoothOn;
+        if (IsKeyPressed(KEY_O)) overscan = !overscan;
+
+        if (overscan)
+        {
+            destRec = (Rectangle) { -virtualRatio, -virtualRatio, screenWidth + (virtualRatio*2), screenHeight + (virtualRatio*2) };
+        }
+        else
+        {
+            destRec = (Rectangle) { (screenWidth - screenWidth/1.25f)/2.0f, (screenHeight - screenHeight/1.25f)/2.0f, screenWidth/1.25f, screenHeight/1.25f };
+        }
+
+
+        // Draw
+        //----------------------------------------------------------------------------------
+        BeginTextureMode(target);
+        ClearBackground(RAYWHITE);
+
+        BeginMode2D(worldSpaceCamera);
+
+        DrawRectangle((int)position.x, (int)position.y, 32, 32, RED);
+
+        DrawRectangle(40, 40, 100, 30, BLUE);
+        DrawRectangle(10, 20, 10, 100, YELLOW);
+
+        DrawRectanglePro(rec01, origin, rotation, BLACK);
+        DrawRectanglePro(rec02, origin, -rotation, RED);
+        DrawRectanglePro(rec03, origin, rotation + 45.0f, BLUE);
 
         EndMode2D();
         EndTextureMode();
 
-        /// DRAW GUI
         BeginDrawing();
-        ClearBackground(RAYWHITE);
-        DrawTexture(application_surface.texture, 0, 0, WHITE);
+        ClearBackground(LIGHTGRAY);
+
+        if (smoothOn)
+        {
+            BeginMode2D(screenSpaceCamera);
+            DrawTexturePro(target.texture, sourceRec, destRec, origin, 0.0f, WHITE);
+            EndMode2D();
+        }
+        else
+        {
+            DrawTexturePro(target.texture, sourceRec, destRec, origin, 0.0f, WHITE);
+        }
+
+        DrawText(TextFormat("Screen resolution: %ix%i", screenWidth, screenHeight), 10, 10, 20, DARKBLUE);
+        DrawText(TextFormat("World resolution: %ix%i", virtualScreenWidth, virtualScreenHeight), 10, 40, 20, DARKGREEN);
+        DrawText(TextFormat("Smooth: %s", (smoothOn ? "ON" : "OFF")), 10, screenHeight - 60, 20, RED);
+        DrawText(TextFormat("Overscan: %s", (overscan ? "ON" : "OFF")), 10, screenHeight - 30, 20, RED);
+        DrawFPS(GetScreenWidth() - 95, 10);
         EndDrawing();
+        //--------------------
+
+
+        // /// DRAW
+        // BeginTextureMode(application_surface);
+        // BeginMode2D(camera);
+        //
+        // ClearBackground(BLACK);
+        // DrawRectangle((int) position.x - 16, (int) position.y - 16, 32, 32, RED);
+        // DrawText("Hello Raylib", 200, 200, 20,WHITE);
+        //
+        // EndMode2D();
+        // EndTextureMode();
+        //
+        // /// DRAW GUI
+        // BeginDrawing();
+        // ClearBackground(RAYWHITE);
+        // DrawTexture(application_surface.texture, 0, 0, WHITE);
+        // EndDrawing();
     }
 
+    UnloadRenderTexture(target);
     CloseWindow();
     return 0;
 }
