@@ -1,9 +1,9 @@
 #include <math.h>
-#include <stddef.h>
 #include <stdlib.h>
 
 #include "raylib.h"
 #include "resource_dir.h"
+#include "entity.h"
 
 typedef enum {
     LEFT = 0,
@@ -59,9 +59,19 @@ float image_number = 4;
 bool is_moving = false;
 Direction direction = DOWN;
 
+typedef struct {
+    Vector2 position;
+    float speed;
+    float image_index;
+    float image_number;
+    bool is_moving;
+    Direction direction;
+} ObjBatter;
+
+
 int main() {
     setup();
-
+    entity_hi();
     while (!WindowShouldClose()) {
         step();
         draw();
@@ -133,11 +143,7 @@ void draw(void) {
     }
 
     Rectangle frameRectangle = (Rectangle){16.0f * truncf(image_index), 0, 16, 24};
-
     DrawTextureRec(sprites[player_sprite], frameRectangle, (Vector2){position.x, position.y}, WHITE);
-
-
-    //DrawRectangle((int) position.x - 16, (int) position.y - 16, 32, 32, RED);
 
     for (int sprite = 0; sprite < SPRITES_TOTAL; sprite++) {
         if (IsTextureValid(sprites[sprite])) {
