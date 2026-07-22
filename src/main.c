@@ -1,13 +1,15 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "raylib.h"
 #include "entity.h"
 #include "raymath.h"
 
 typedef enum {
-    LEFT = 0,
+    RIGHT = 0,
     UP = 90,
-    RIGHT = 180,
+    LEFT = 180,
     DOWN = 270,
 } Direction;
 
@@ -51,16 +53,29 @@ void obj_walker_draw(Entity* self) {
 void obj_gun_create(Entity* self, void* data) {
 }
 
+typedef struct {
+    Direction direction;
+} ObjBulletData;
+
 void obj_gun_step(Entity* self) {
-    const bool up = IsKeyDown(KEY_W);
-    const bool left = IsKeyDown(KEY_A);
-    const bool down = IsKeyDown(KEY_S);
-    const bool right = IsKeyDown(KEY_D);
+    const bool up = IsKeyPressed(KEY_W);
+    const bool left = IsKeyPressed(KEY_A);
+    const bool down = IsKeyPressed(KEY_S);
+    const bool right = IsKeyPressed(KEY_D);
 
     const bool shoot = up || left || down || right;
     if (!shoot) return;
 
-    entity_create(OBJ_TEST_BULLET, self->position.x, self->position.y, nullptr);
+    Direction direction;
+    if (up) direction = UP;
+    else if (left) direction = LEFT;
+    else if (right) direction = RIGHT;
+    else direction = DOWN;
+
+    ObjBulletData bullet_data = {
+        .direction = direction
+    };
+    entity_create(OBJ_TEST_BULLET, self->position.x, self->position.y, &bullet_data);
 }
 
 void obj_gun_draw(Entity* self) {
@@ -68,19 +83,31 @@ void obj_gun_draw(Entity* self) {
 }
 
 void obj_bullet_create(Entity* self, void* data) {
+    ObjBulletData* bullet_data = malloc(sizeof(ObjBulletData));
+
+    if (data) {
+        memcpy(bullet_data, data, sizeof(ObjBulletData));
+    }
+
+    self->data = bullet_data;
 }
 
 void obj_bullet_step(Entity* self) {
+    ObjBulletData* bullet_data = self->data;
 
+    float angle = bullet_data->direction  * DEG2RAD;
+    float speed = 3.0f;
+    Vector2 velocity = {
+        cosf(angle) * speed,
+        -sinf(angle) * speed
+    };
+
+    self->position = Vector2Add(self->position, velocity);
 }
 
 void obj_bullet_draw(Entity* self) {
     DrawRectangleV(self->position, (Vector2){10, 10}, YELLOW);
 }
-
-typedef struct {
-
-} ObjBulletData;
 
 int main() {
     InitWindow(400, 400, "DEBUG");

@@ -38,7 +38,7 @@ typedef struct {
 } Entity;
 
 typedef struct {
-    void (*create)(Entity* self, void* data);
+    void (*create)(Entity* self, void* raw_data);
     void (*step)(Entity* self);
     void (*draw)(Entity* self);
 } Entity_Methods;
