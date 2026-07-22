@@ -16,9 +16,11 @@ typedef enum {
 } SpriteID;
 
 typedef enum {
-    OBJ_TEST,
+    OBJ_NONE,
     OBJ_TEST_WALKER,
     OBJ_TEST_LOGGER,
+    OBJ_TEST_GUN,
+    OBJ_TEST_BULLET,
     OBJ_BATTER,
     TOTAL_GAME_OBJECTS
 } GameObjectID;
@@ -36,7 +38,7 @@ typedef struct {
 } Entity;
 
 typedef struct {
-    Entity (*create)(Vector2 position, void* data);
+    void (*create)(Entity* self, void* data);
     void (*step)(Entity* self);
     void (*draw)(Entity* self);
 } Entity_Methods;
@@ -46,7 +48,10 @@ void entity_draw(Entity* entity);
 
 void entity_register(GameObjectID id, Entity_Methods entity_methods);
 
-void entity_create(GameObjectID id, float x, float y);
-void entity_createV(GameObjectID id, Vector2 position);
+void entity_create(GameObjectID id, float x, float y, void* data);
+void entity_createV(GameObjectID id, Vector2 position, void* data);
 
 void entity_draw_self(Entity* self);
+
+void entities_step();
+void entities_draw();
