@@ -75,7 +75,7 @@ void obj_gun_step(Entity* self) {
     ObjBulletData bullet_data = {
         .direction = direction
     };
-    entity_create(OBJ_TEST_BULLET, self->position.x, self->position.y, &bullet_data);
+    entity_create(OBJ_TEST_BULLET, &bullet_data, self->position.x, self->position.y);
 }
 
 void obj_gun_draw(Entity* self) {
@@ -93,9 +93,18 @@ void obj_bullet_create(Entity* self, void* data) {
 }
 
 void obj_bullet_step(Entity* self) {
+    const float x = self->position.x;
+    const float y = self->position.y;
+
+    // Destroy if out of bounds
+    if (x < 0 || x > 400 || y < 0 || y > 400) {
+        entity_destroy(self);
+        return;
+    }
+
     ObjBulletData* bullet_data = self->data;
 
-    float angle = bullet_data->direction  * DEG2RAD;
+    float angle = bullet_data->direction * DEG2RAD;
     float speed = 3.0f;
     Vector2 velocity = {
         cosf(angle) * speed,
@@ -109,50 +118,42 @@ void obj_bullet_draw(Entity* self) {
     DrawRectangleV(self->position, (Vector2){10, 10}, YELLOW);
 }
 
+void obj_bullet_destroy(Entity* self) {
+    printf("Bullet destroyed");
+}
+
+#define ENTITY_REGISTER(id, prefix) \
+    entity_register(id, (Entity_Methods){ \
+        .create = prefix##_create, \
+        .step = prefix##_step, \
+        .draw = prefix##_draw, \
+    })
+
 int main() {
     InitWindow(400, 400, "DEBUG");
     SetTargetFPS(60);
 
-    entity_register(OBJ_TEST_LOGGER, (Entity_Methods){
-                        .create = obj_logger_create,
-                        .step = obj_logger_step,
-                        .draw = obj_logger_draw,
-                    });
-
-    entity_register(OBJ_TEST_WALKER, (Entity_Methods){
-                        .create = obj_walker_create,
-                        .step = obj_walker_step,
-                        .draw = obj_walker_draw,
-                    });
-
-    entity_register(OBJ_TEST_GUN, (Entity_Methods){
-                        .create = obj_gun_create,
-                        .step = obj_gun_step,
-                        .draw = obj_gun_draw,
-                    });
-
+    ENTITY_REGISTER(OBJ_TEST_LOGGER, obj_logger);
+    ENTITY_REGISTER(OBJ_TEST_WALKER, obj_walker);
+    ENTITY_REGISTER(OBJ_TEST_GUN, obj_gun);
     entity_register(OBJ_TEST_BULLET, (Entity_Methods){
-                        .create = obj_bullet_create,
-                        .step = obj_bullet_step,
-                        .draw = obj_bullet_draw,
+                        .create = obj_bullet_create, .step = obj_bullet_step, .draw = obj_bullet_draw, .destroy = obj_bullet_destroy
                     });
 
-
-    entity_create(OBJ_TEST_WALKER, 100, 100, nullptr);
-    entity_create(OBJ_TEST_LOGGER, 100, 100, nullptr);
-    entity_create(OBJ_TEST_GUN, 200, 200, nullptr);
+    entity_create(OBJ_TEST_WALKER, nullptr, 100, 100);
+    entity_create(OBJ_TEST_LOGGER, nullptr, 100, 100);
+    entity_create(OBJ_TEST_GUN, nullptr, 200, 200);
 
     while (!WindowShouldClose()) {
-        entities_step();
+        entity_step_all();
 
         if (IsKeyPressed(KEY_N)) {
-            entity_create(OBJ_TEST_WALKER, 100, 100, nullptr);
-            //entities[total_entities++] = obj_walker_create((Vector2){100, 100});
+            entity_create(OBJ_TEST_WALKER, nullptr, 100, 100);
         }
 
         BeginDrawing();
         ClearBackground(BLACK);
-        entities_draw();
+        entity_draw_all();
         EndDrawing();
     }
 

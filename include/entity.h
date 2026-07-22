@@ -27,12 +27,13 @@ typedef enum {
 
 typedef struct {
     GameObjectID id;
+    int instance_id;
+
     Vector2 position;
 
-    SpriteID sprite;
+    SpriteID sprite_index;
     float image_speed;
     float image_index;
-    int image_number;
 
     void* data;
 } Entity;
@@ -41,17 +42,20 @@ typedef struct {
     void (*create)(Entity* self, void* raw_data);
     void (*step)(Entity* self);
     void (*draw)(Entity* self);
+    void (*destroy)(Entity* self);
+    void (*cleanup)(Entity* self);
 } Entity_Methods;
-
-void entity_step(Entity* entity);
-void entity_draw(Entity* entity);
 
 void entity_register(GameObjectID id, Entity_Methods entity_methods);
 
-void entity_create(GameObjectID id, float x, float y, void* data);
-void entity_createV(GameObjectID id, Vector2 position, void* data);
+void entity_create(GameObjectID id, void* data, float x, float y);
+void entity_createV(GameObjectID id, void* data, Vector2 position);
+void entity_step(Entity* entity);
+void entity_draw(Entity* entity);
+void entity_destroy(Entity* entity);
+//void entity_cleanup(Entity* entity);
+
+void entity_step_all();
+void entity_draw_all();
 
 void entity_draw_self(Entity* self);
-
-void entities_step();
-void entities_draw();
